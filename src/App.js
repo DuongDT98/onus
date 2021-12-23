@@ -1,6 +1,10 @@
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import logo from "./onus.png";
+import logo_onus from "./logo_onus.png";
+import logo_vndc from "./logo_vndc.png";
+import logo_usdt from "./logo_usdt.png";
 
 function App() {
   const [vndc] = useState(2500000);
@@ -22,7 +26,7 @@ function App() {
           setDataPrice(res.data);
         })
         .catch((error) => console.log(error));
-    }, 5000);
+    }, 1000);
   }, []);
 
   useEffect(() => {
@@ -44,9 +48,9 @@ function App() {
   }, [dataPrice, vndc, setPay, setBuy]);
 
   useEffect(() => {
-    if (pay > 5000) {
+    if (pay > 10000) {
       showNotificationWin1();
-    } else if (buy > 5000) {
+    } else if (buy > 10000) {
       showNotificationWin2();
     }
   }, [pay, buy]);
@@ -74,7 +78,7 @@ function App() {
   return (
     <div className="body">
       <div style={{ textAlign: "center" }}>
-        <img src="onus.png" alt="Onus Logo"></img>
+        <img src={logo} alt="Onus Logo"></img>
       </div>
       <div className="vndc">
         <h1>VNDC : {moneyFormat(vndc)}</h1>
@@ -102,57 +106,25 @@ function App() {
       <div className="App">
         <div className="pay">
           <h1 style={{ color: "blue", display: "inline-flex" }}>
-            <img
-              src="logo_vndc.png"
-              alt="Onus Logo"
-              className="image_logo"
-            ></img>
+            <img src={logo_vndc} alt="Onus Logo" className="image_logo"></img>
             =>
-            <img
-              src="logo_onus.png"
-              alt="Onus Logo"
-              className="image_logo"
-            ></img>
+            <img src={logo_onus} alt="Onus Logo" className="image_logo"></img>
             =>
-            <img
-              src="logo_usdt.png"
-              alt="Onus Logo"
-              className="image_logo"
-            ></img>
+            <img src={logo_usdt} alt="Onus Logo" className="image_logo"></img>
             =>
-            <img
-              src="logo_vndc.png"
-              alt="Onus Logo"
-              className="image_logo"
-            ></img>
+            <img src={logo_vndc} alt="Onus Logo" className="image_logo"></img>
           </h1>
           <h2 className={pay > 0 ? "win" : "lose"}>{pay}</h2>
         </div>
         <div className="buy">
           <h1 style={{ color: "blue", display: "inline-flex" }}>
-            <img
-              src="logo_vndc.png"
-              alt="Onus Logo"
-              className="image_logo"
-            ></img>
+            <img src={logo_vndc} alt="Onus Logo" className="image_logo"></img>
             =>
-            <img
-              src="logo_usdt.png"
-              alt="Onus Logo"
-              className="image_logo"
-            ></img>
+            <img src={logo_usdt} alt="Onus Logo" className="image_logo"></img>
             =>
-            <img
-              src="logo_onus.png"
-              alt="Onus Logo"
-              className="image_logo"
-            ></img>
+            <img src={logo_onus} alt="Onus Logo" className="image_logo"></img>
             =>
-            <img
-              src="logo_vndc.png"
-              alt="Onus Logo"
-              className="image_logo"
-            ></img>
+            <img src={logo_vndc} alt="Onus Logo" className="image_logo"></img>
           </h1>
           <h2 className={buy > 0 ? "win" : "lose"}>{buy}</h2>
         </div>
