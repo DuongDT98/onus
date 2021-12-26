@@ -1,20 +1,43 @@
 .body {
-  background-color: black;
+  background: black;
   height: 100vh;
+  width: 100%;
 }
 .App {
   display: flex;
   text-align: center;
+  width: 100%;
+}
+.App-mobile {
+  display: grid;
+  justify-content: space-around;
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
 }
 
 .pay {
   width: 50%;
   border-right: 2px solid green;
 }
+.pay-mobile {
+  width: 100%;
+  text-align: center;
+}
 .buy {
   width: 50%;
+  text-align: center;
+}
+.buy-molile {
+  width: 100%;
 }
 .vndc {
+  margin-left: 10%;
+  color: white;
+  display: flex;
+  justify-content: space-around;
+}
+.vndc-mobile {
   margin-left: 10%;
   color: white;
 }
@@ -45,4 +68,10 @@
 .image_logo {
   height: 50px;
   width: 50px;
+}
+.input-usdt {
+  font-size: 24px;
+}
+.logo-mobile {
+  height: 50px;
 }
