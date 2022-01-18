@@ -1,203 +1,214 @@
-import "./App.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import cx from "classnames";
-import logo from "./onus.png";
-import logo_onus from "./logo_onus.png";
-import logo_vndc from "./logo_vndc.png";
-import logo_usdt from "./logo_usdt.png";
+import RowInfo from "./components/RowInfo/index";
+import "./App.css";
+import notifyAudio from "./assets/tien-ve4.mp3";
+
+function getAllListCrypto() {
+  return axios.get("https://exchange.vndc.io/exchange/api/v1/showup-prices");
+}
+
+function getCryptoBySymbolAtlas(symbol) {
+  return axios.get(
+    `https://api.attlas.io/api/v1/exchange/depth?symbol=${symbol || "RACAUSDT"}`
+  );
+}
+
+function getUsdtP2p(symbol, type) {
+  return axios
+    .get(
+      `https://vndc.io/p2p?type=${type || "BUY"}&currency=${symbol || "USDT"}`
+    )
+    .then((res) => {
+      const slideIndexFrom = res?.data.search("font-bold text-18px");
+      const dataSlice = res?.data
+        ?.slice(slideIndexFrom + 25, slideIndexFrom + 35)
+        ?.replace("V", "")
+        ?.replace("N", "")
+        ?.replace(",", "");
+      return dataSlice;
+    });
+}
+
+const useAudio = (url) => {
+  const audio = useMemo(() => new Audio(url), []);
+  const [playing, setPlaying] = useState(false);
+
+  const toggle = () => setPlaying(true);
+
+  useEffect(() => {
+    playing ? audio.play() : audio.pause();
+  }, [playing]);
+
+  useEffect(() => {
+    audio.addEventListener("ended", () => setPlaying(false));
+    return () => {
+      audio.removeEventListener("ended", () => setPlaying(false));
+    };
+  }, []);
+
+  return [playing, toggle];
+};
 
 function App() {
-  const [vndc] = useState(2500000);
-  const [dataPrice, setDataPrice] = useState([]);
-  const [onusBuy, setOnusBuy] = useState(0);
-  const [onusSell, setOnusSell] = useState(0);
-  const [usdtBuy, setUsdtBuy] = useState(0);
-  const [usdtSell, setUsdtSell] = useState(0);
-  const [pay, setPay] = useState(0);
-  const [buy, setBuy] = useState(0);
-  const [priceUSDT, setPriceUSDT] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth);
+  const [listCoins, setListCoins] = useState([]);
+  const [usdtVndcFixed, setUsdtVndcFixed] = useState(23450);
+  const [usdtVndcFixedP2P, setUsdtVndcFixedP2P] = useState(0);
+  const [inputUsdtVndcFixed, setInputUsdtVndcFixed] = useState(0);
+  const [playing, alertNotify] = useAudio(notifyAudio);
+  const [atlasRaccaUsdt, setAtlasRaccaUsdt] = useState({});
+  const [atlasRaccaVndc, setAtlasRaccaVndc] = useState({});
+  const handleUsdt = async () => {
+    const usdtBuy = await getUsdtP2p("USDT");
+    const usdtSell = await getUsdtP2p("USDT", "SELL");
+    const avg = (Number(usdtSell) + Number(usdtBuy)) / 2;
 
-  const updateDimensions = () => {
-    setIsMobile(window.innerWidth);
+    if (avg) {
+      setUsdtVndcFixedP2P(avg || 0);
+    }
   };
 
-  useEffect(() => {
-    window.addEventListener("resize", updateDimensions);
-  }, [isMobile]);
-
-  useEffect(() => {
-    return () => window.removeEventListener("resize", updateDimensions);
-  }, []);
+  const handleGetAtlasCrypto = async () => {
+    try {
+      const resusdt = await getCryptoBySymbolAtlas("RACAUSDT");
+      const resvndc = await getCryptoBySymbolAtlas("RACAVNDC");
+      const dataUsdt = resusdt?.data?.data;
+      const dataVndc = resvndc?.data?.data;
+      setAtlasRaccaUsdt({
+        ask: dataUsdt.bids[0][0],
+        bid: dataUsdt.asks[0][0],
+      });
+      setAtlasRaccaVndc({
+        ask: dataVndc.bids[0][0],
+        bid: dataVndc.asks[0][0],
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     setInterval(() => {
-      axios
-        .get(
-          "https://exchange.vndc.io/exchange/api/v1/showup-prices?fbclid=IwAR1H2haR3YBV6D88n3je7X64_1-6aJvjQ81mQAZLZCBK-jNAYKm2hj1JuvY"
-        )
-        .then((res) => {
-          setDataPrice(res.data);
-        })
-        .catch((error) => console.log(error));
+      handleUsdt();
+    }, 10000);
+    setInterval(async () => {
+      handleGetAtlasCrypto();
+      const res = await getAllListCrypto();
+      const data = res?.data;
+      const usdtBuy = data["USDTVNDC"]?.bid;
+      const usdtSell = data["USDTVNDC"]?.ask;
+      const avg = (Number(usdtSell) + Number(usdtBuy)) / 2;
+
+      if (avg) {
+        setUsdtVndcFixed(avg || 0);
+      }
+      setListCoins(data);
     }, 2000);
   }, []);
 
-  useEffect(() => {
-    setOnusBuy(dataPrice?.ONUSVNDC?.bid);
-    setOnusSell(dataPrice?.ONUSVNDC?.ask);
-    const Pay =
-      (vndc / dataPrice?.ONUSVNDC?.bid) *
-        Number(dataPrice?.ONUSUSDT?.ask) *
-        (!priceUSDT ? dataPrice?.USDTVNDC?.ask : usdtSell) -
-      vndc -
-      vndc * 0.0012;
-    const Buy =
-      (vndc /
-        (!priceUSDT ? dataPrice?.USDTVNDC?.bid : usdtBuy) /
-        Number(dataPrice?.ONUSUSDT?.bid)) *
-        dataPrice?.ONUSVNDC?.ask -
-      vndc -
-      vndc * 0.0012;
-    setPay(Pay.toFixed(4));
-    setBuy(Buy.toFixed(4));
-  }, [dataPrice, vndc, setPay, setBuy, usdtBuy, usdtSell, priceUSDT]);
-
-  useEffect(() => {
-    if (pay > 10000) {
-      isMobile > 800 && showNotificationWin1();
-    } else if (buy > 10000) {
-      isMobile > 800 && showNotificationWin2();
+  function handleALert() {
+    if (playing) {
+      return;
     }
-  }, [pay, buy, isMobile]);
+    console.log("sound!!!");
+    alertNotify();
+  }
 
-  const showNotificationWin1 = () => {
-    const notification = new Notification("New message from dcode!", {
-      body: `Trade Onus Có Lãi ${parseFloat(pay).toFixed(0)} Kìa `,
-    });
-  };
-  const showNotificationWin2 = () => {
-    const notification = new Notification("New message from dcode!", {
-      body: `Trade Onus Có Lãi ${parseFloat(buy).toFixed(0)} Kìa `,
-    });
-  };
-
-  const moneyFormat = (price) => {
-    const pieces = parseFloat(price).toFixed(0).split("");
-    let ii = pieces.length;
-    while ((ii -= 3) > 0) {
-      pieces.splice(ii, 0, ",");
-    }
-    return pieces.join("");
-  };
-
-  const handleChangeUsdt = (value, field) => {
-    switch (field) {
-      case "usdtBuy":
-        setUsdtBuy(value);
-        setPriceUSDT(true);
-        break;
-
-      default:
-        setUsdtSell(value);
-        setPriceUSDT(true);
-        break;
-    }
-  };
-
+  const listCoinsWatch = [
+    {
+      name: "ONUS",
+      vndcPrice: listCoins["ONUSVNDC"],
+      usdtPrice: listCoins["ONUSUSDT"],
+      usdtVndcFixed:
+        inputUsdtVndcFixed > 23000
+          ? inputUsdtVndcFixed
+          : usdtVndcFixedP2P !== 0
+          ? usdtVndcFixedP2P
+          : usdtVndcFixed,
+      pcAlert: 0.5,
+      percentInlation: 0.01,
+      handleALert: handleALert,
+      percentShowWarning: 0.5,
+    },
+    {
+      name: "RACA",
+      vndcPrice: listCoins["RACAVNDC"],
+      usdtPrice: listCoins["RACAUSDT"],
+      usdtVndcFixed:
+        inputUsdtVndcFixed > 23000
+          ? inputUsdtVndcFixed
+          : usdtVndcFixedP2P !== 0
+          ? usdtVndcFixedP2P
+          : usdtVndcFixed,
+      pcAlert: 2,
+      percentInlation: 0.02,
+      handleALert: handleALert,
+      percentShowWarning: 1,
+    },
+    {
+      name: "RACAAT",
+      vndcPrice: atlasRaccaVndc,
+      usdtPrice: atlasRaccaUsdt,
+      usdtVndcFixed:
+        inputUsdtVndcFixed > 23000
+          ? inputUsdtVndcFixed
+          : usdtVndcFixedP2P !== 0
+          ? usdtVndcFixedP2P
+          : usdtVndcFixed,
+      pcAlert: 2,
+      percentInlation: 0.02,
+      handleALert: handleALert,
+      percentShowWarning: 1,
+    },
+  ];
   return (
-    <div className="body">
-      <div style={{ textAlign: "center" }}>
-        <img
-          src={logo}
-          alt="Onus Logo"
-          className={cx({ "logo-mobile": isMobile < 800 })}
-        />
-      </div>
-      <div
-        className={cx({
-          "vndc-mobile": isMobile < 800,
-          vndc: isMobile > 800,
-        })}
-      >
-        <h1>VNDC : {moneyFormat(vndc)}</h1>
+    <div className="App">
+      <div className="p2p-usdt">
+        <span>INPUT P2P USDT/VNDC : </span>
         <input
-          type={"text"}
-          onChange={(e) => handleChangeUsdt(e.target.value, "usdtBuy")}
-          placeholder="USDT Buy"
-          className="input-usdt"
-        />
-        <input
-          type={"text"}
-          onChange={(e) => handleChangeUsdt(e.target.value, "usdtSell")}
-          placeholder="USDT Sell"
-          className="input-usdt"
+          onChange={(e) => {
+            setInputUsdtVndcFixed(e.target.value);
+          }}
+          style={{ padding: "5px" }}
+          value={inputUsdtVndcFixed}
         />
       </div>
-      {isMobile > 800 && (
-        <div style={{ display: "flex" }}>
-          <div className="onus">
-            <div>
-              <h1>Onus</h1>
-            </div>
-            <div className="price">
-              <h1>Buy : {onusBuy}</h1>
-              <h1>Sell : {onusSell}</h1>
-            </div>
-          </div>
-          <div className="usdt">
-            <div>
-              <h1>Usdt</h1>
-            </div>
-            <div className="price">
-              <h1>Buy : {usdtBuy}</h1>
-              <h1>Sell : {usdtSell}</h1>
-            </div>
-          </div>
-        </div>
-      )}
-      <div
-        className={cx({
-          "App-mobile": isMobile < 800,
-          App: isMobile > 800,
-        })}
-      >
-        <div
-          className={cx({
-            "pay-mobile": isMobile < 800,
-            pay: isMobile > 800,
-          })}
-        >
-          <h1 style={{ color: "blue", display: "inline-flex" }}>
-            <img src={logo_vndc} alt="Onus Logo" className="image_logo"></img>
-            =>
-            <img src={logo_onus} alt="Onus Logo" className="image_logo"></img>
-            =>
-            <img src={logo_usdt} alt="Onus Logo" className="image_logo"></img>
-            =>
-            <img src={logo_vndc} alt="Onus Logo" className="image_logo"></img>
-          </h1>
-          <h2 className={pay > 0 ? "win" : "lose"}>{pay}</h2>
-        </div>
-        <div
-          className={cx({
-            "buy-mobile": isMobile < 800,
-            buy: isMobile > 800,
-          })}
-        >
-          <h1 style={{ color: "blue", display: "inline-flex" }}>
-            <img src={logo_vndc} alt="Onus Logo" className="image_logo"></img>
-            =>
-            <img src={logo_usdt} alt="Onus Logo" className="image_logo"></img>
-            =>
-            <img src={logo_onus} alt="Onus Logo" className="image_logo"></img>
-            =>
-            <img src={logo_vndc} alt="Onus Logo" className="image_logo"></img>
-          </h1>
-          <h2 className={buy > 0 ? "win" : "lose"}>{buy}</h2>
-        </div>
+      <div className="p2p-usdt">
+        P2P USDT/VNDC: 1/
+        {inputUsdtVndcFixed > 23000
+          ? inputUsdtVndcFixed
+          : usdtVndcFixedP2P !== 0
+          ? usdtVndcFixedP2P
+          : usdtVndcFixed}
       </div>
+      <br />
+      <br />
+      <br />
+      <table border="1">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>USDT</th>
+            <th>VND</th>
+            <th>USDT*COIN = VNDC</th>
+          </tr>
+        </thead>
+        <tbody>
+          {listCoinsWatch.map((item, index) => (
+            <RowInfo
+              key={index}
+              name={item.name}
+              vndcPrice={item.vndcPrice}
+              usdtPrice={item.usdtPrice}
+              usdtVndcFixed={item.usdtVndcFixed}
+              pcAlert={item.pcAlert}
+              percentInlation={item.percentInlation}
+              handleALert={item.handleALert}
+              percentShowWarning={item.percentShowWarning}
+            />
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
