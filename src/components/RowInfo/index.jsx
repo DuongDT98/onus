@@ -36,9 +36,9 @@ const RowInfo = ({
         <td>{name}</td>
         <td>
           <div className="price usdt">
-            Buy: {usdtPrice?.bid}
+            Buy: {(usdtPrice?.bid * usdtVndcFixed).toFixed(2)}
             <br />
-            Sell: {usdtPrice?.ask}
+            Sell: {(usdtPrice?.ask * usdtVndcFixed).toFixed(2)}
           </div>
         </td>
         <td>
