@@ -14,6 +14,12 @@ function getCryptoBySymbolAtlas(symbol) {
   );
 }
 
+function getCryptoBySymbolMexc(symbol) {
+  return axios.get(
+    `https://www.mexc.com/api/platform/market/spot/deals?symbol=${symbol}`
+  );
+}
+
 function getUsdtP2p(symbol, type) {
   return axios
     .get(
@@ -58,6 +64,8 @@ function App() {
   const [playing, alertNotify] = useAudio(notifyAudio);
   const [atlasRaccaUsdt, setAtlasRaccaUsdt] = useState({});
   const [atlasRaccaVndc, setAtlasRaccaVndc] = useState({});
+  const [itamMexcUsdt, setItamMexcUsdt] = useState(0);
+  const [bcoinMexcUsdt, setBcoinMexcUsdt] = useState(0);
   const handleUsdt = async () => {
     const usdtBuy = await getUsdtP2p("USDT");
     const usdtSell = await getUsdtP2p("USDT", "SELL");
@@ -65,6 +73,19 @@ function App() {
 
     if (avg) {
       setUsdtVndcFixedP2P(avg || 0);
+    }
+  };
+
+  const handleGetMexcCrypto = async () => {
+    try {
+      const resItamusdt = await getCryptoBySymbolMexc("ITAMCUBE_USDT");
+      const resBcoinusdt = await getCryptoBySymbolMexc("BCOIN_USDT");
+      const dataItamUsdt = resItamusdt?.data?.data?.data[0]?.p;
+      const dataBcoinUsdt = resBcoinusdt?.data?.data?.data[0]?.p;
+      setItamMexcUsdt(dataItamUsdt);
+      setBcoinMexcUsdt(dataBcoinUsdt);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -93,6 +114,7 @@ function App() {
     }, 10000);
     setInterval(async () => {
       handleGetAtlasCrypto();
+      handleGetMexcCrypto();
       const res = await getAllListCrypto();
       const data = res?.data;
       const usdtBuy = data["USDTVNDC"]?.bid;
@@ -160,29 +182,55 @@ function App() {
       handleALert: handleALert,
       percentShowWarning: 1,
     },
+    {
+      name: "ITAMCUBE",
+      usdtPrice: itamMexcUsdt,
+      vndcPrice: listCoins["ITAMCUBEVNDC"],
+      usdtVndcFixed:
+        inputUsdtVndcFixed > 23000
+          ? inputUsdtVndcFixed
+          : usdtVndcFixedP2P !== 0
+          ? usdtVndcFixedP2P
+          : usdtVndcFixed,
+      pcAlert: 3,
+      percentInlation: 0.02,
+      handleALert: handleALert,
+      percentShowWarning: 1,
+    },
+    {
+      name: "BCOIN",
+      usdtPrice: bcoinMexcUsdt,
+      vndcPrice: listCoins["BCOINVNDC"],
+      usdtVndcFixed:
+        inputUsdtVndcFixed > 23000
+          ? inputUsdtVndcFixed
+          : usdtVndcFixedP2P !== 0
+          ? usdtVndcFixedP2P
+          : usdtVndcFixed,
+      pcAlert: 3,
+      percentInlation: 0.02,
+      handleALert: handleALert,
+      percentShowWarning: 1,
+    },
   ];
   return (
     <div className="App">
       <div className="p2p-usdt">
-        <span>INPUT P2P USDT/VNDC : </span>
+        <span>INPUT USDT : </span>
         <input
           onChange={(e) => {
             setInputUsdtVndcFixed(e.target.value);
           }}
-          style={{ padding: "5px" }}
+          style={{ padding: "5px", width: "50px" }}
           value={inputUsdtVndcFixed}
-        />
-      </div>
-      <div className="p2p-usdt">
-        P2P USDT/VNDC: 1/
+        />{" "}
+        USDT: 1/
         {inputUsdtVndcFixed > 23000
           ? inputUsdtVndcFixed
           : usdtVndcFixedP2P !== 0
           ? usdtVndcFixedP2P
           : usdtVndcFixed}
       </div>
-      <br />
-      <br />
       <br />
       <table border="1">
         <thead>

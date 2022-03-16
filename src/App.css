@@ -41,7 +41,7 @@ body {
   color: #fff;
 }
 .App {
-  margin-top: 50px;
+  margin-top: 20px;
 }
 .wrap {
   display: flex;
@@ -49,7 +49,6 @@ body {
   align-items: center;
 }
 .p2p-usdt {
-  margin-top: 1rem;
   font-size: 22px;
 }
 

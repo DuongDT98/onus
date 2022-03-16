@@ -16,9 +16,12 @@ const RowInfo = ({
   const [percentAlertFixed, setPercentAlertFixed] = useState(pcAlert || 1);
 
   const avgVndcPrice = Number((vndcPrice?.ask + vndcPrice?.bid) / 2);
-  const avgUsdtPrice = Number(
-    (Number(usdtPrice?.ask) + Number(usdtPrice?.bid)) / 2
-  );
+  const avgUsdtPrice =
+    name === "ITAMCUBE"
+      ? usdtPrice
+      : name === "BCOIN"
+      ? usdtPrice
+      : Number((Number(usdtPrice?.ask) + Number(usdtPrice?.bid)) / 2);
   const usdtExchangePrice = Number(usdtVndcFixed * avgUsdtPrice);
 
   const percentFluctuating = getPercentFluctuating(
@@ -36,9 +39,28 @@ const RowInfo = ({
         <td>{name}</td>
         <td>
           <div className="price usdt">
-            Buy: {(usdtPrice?.bid * usdtVndcFixed).toFixed(2)}
-            <br />
-            Sell: {(usdtPrice?.ask * usdtVndcFixed).toFixed(2)}
+            {name === "ITAMCUBE" ? (
+              <>
+                Buy USDT: {Number(usdtPrice).toFixed(4)}
+                <br />
+                Sell VNDC:
+                {Number(Number(usdtPrice) * usdtVndcFixed).toFixed(0)}
+              </>
+            ) : name === "BCOIN" ? (
+              <>
+                Buy USDT: {Number(usdtPrice).toFixed(4)}
+                <br />
+                Sell VNDC:
+                {Number(Number(usdtPrice) * usdtVndcFixed).toFixed(0)}
+              </>
+            ) : (
+              <>
+                Buy:{(usdtPrice?.bid * usdtVndcFixed).toFixed(2)}
+                <br />
+                Sell:
+                {(usdtPrice?.ask * usdtVndcFixed).toFixed(2)}
+              </>
+            )}
           </div>
         </td>
         <td>
