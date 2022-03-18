@@ -147,10 +147,10 @@ function App() {
           : usdtVndcFixedP2P !== 0
           ? usdtVndcFixedP2P
           : usdtVndcFixed,
-      pcAlert: 0.5,
+      pcAlert: 1.5,
       percentInlation: 0.01,
       handleALert: handleALert,
-      percentShowWarning: 0.5,
+      percentShowWarning: 1,
     },
     {
       name: "RACA",
@@ -162,10 +162,10 @@ function App() {
           : usdtVndcFixedP2P !== 0
           ? usdtVndcFixedP2P
           : usdtVndcFixed,
-      pcAlert: 2,
+      pcAlert: 4,
       percentInlation: 0.02,
       handleALert: handleALert,
-      percentShowWarning: 1,
+      percentShowWarning: 2,
     },
     {
       name: "RACAAT",
@@ -184,7 +184,7 @@ function App() {
     },
     {
       name: "ITAMCUBE",
-      usdtPrice: itamMexcUsdt,
+      usdtPrice: itamMexcUsdt !== 0 ? itamMexcUsdt : listCoins["ITAMCUBEUSDT"],
       vndcPrice: listCoins["ITAMCUBEVNDC"],
       usdtVndcFixed:
         inputUsdtVndcFixed > 23000
@@ -199,7 +199,7 @@ function App() {
     },
     {
       name: "BCOIN",
-      usdtPrice: bcoinMexcUsdt,
+      usdtPrice: bcoinMexcUsdt !== 0 ? bcoinMexcUsdt : listCoins["BCOINVNDC"],
       vndcPrice: listCoins["BCOINVNDC"],
       usdtVndcFixed:
         inputUsdtVndcFixed > 23000
