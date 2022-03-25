@@ -147,7 +147,7 @@ function App() {
           : usdtVndcFixedP2P !== 0
           ? usdtVndcFixedP2P
           : usdtVndcFixed,
-      pcAlert: 1.5,
+      pcAlert: 1,
       percentInlation: 0.01,
       handleALert: handleALert,
       percentShowWarning: 1,
@@ -162,7 +162,7 @@ function App() {
           : usdtVndcFixedP2P !== 0
           ? usdtVndcFixedP2P
           : usdtVndcFixed,
-      pcAlert: 4,
+      pcAlert: 2,
       percentInlation: 0.02,
       handleALert: handleALert,
       percentShowWarning: 2,
@@ -192,14 +192,14 @@ function App() {
           : usdtVndcFixedP2P !== 0
           ? usdtVndcFixedP2P
           : usdtVndcFixed,
-      pcAlert: 3,
+      pcAlert: 5,
       percentInlation: 0.02,
       handleALert: handleALert,
       percentShowWarning: 1,
     },
     {
       name: "BCOIN",
-      usdtPrice: bcoinMexcUsdt !== 0 ? bcoinMexcUsdt : listCoins["BCOINVNDC"],
+      usdtPrice: bcoinMexcUsdt !== 0 ? bcoinMexcUsdt : listCoins["BCOINUSDT"],
       vndcPrice: listCoins["BCOINVNDC"],
       usdtVndcFixed:
         inputUsdtVndcFixed > 23000
@@ -207,7 +207,7 @@ function App() {
           : usdtVndcFixedP2P !== 0
           ? usdtVndcFixedP2P
           : usdtVndcFixed,
-      pcAlert: 3,
+      pcAlert: 7,
       percentInlation: 0.02,
       handleALert: handleALert,
       percentShowWarning: 1,

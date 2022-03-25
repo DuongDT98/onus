@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./row-info.css";
-import { getPercentFluctuating } from "./../../func/func";
+import { getPercentFluctuating, calculatePercent } from "./../../func/func";
 
 const RowInfo = ({
   name,
@@ -16,6 +16,20 @@ const RowInfo = ({
   const [percentAlertFixed, setPercentAlertFixed] = useState(pcAlert || 1);
 
   const avgVndcPrice = Number((vndcPrice?.ask + vndcPrice?.bid) / 2);
+  const avgAskVndc = Number(vndcPrice?.ask);
+  const avgBidVndc =
+    name === "ITAMCUBE"
+      ? Number(usdtPrice) * Number(usdtVndcFixed)
+      : name === "BCOIN"
+      ? Number(usdtPrice) * Number(usdtVndcFixed)
+      : Number(vndcPrice?.bid);
+  const avgAskUsdt =
+    name === "ITAMCUBE"
+      ? Number(usdtPrice) * Number(usdtVndcFixed)
+      : name === "BCOIN"
+      ? Number(usdtPrice) * Number(usdtVndcFixed)
+      : Number(usdtPrice?.ask) * Number(usdtVndcFixed);
+  const avgBidUsdt = Number(usdtPrice?.bid) * Number(usdtVndcFixed);
   const avgUsdtPrice =
     name === "ITAMCUBE"
       ? usdtPrice
@@ -24,10 +38,18 @@ const RowInfo = ({
       : Number((Number(usdtPrice?.ask) + Number(usdtPrice?.bid)) / 2);
   const usdtExchangePrice = Number(usdtVndcFixed * avgUsdtPrice);
 
-  const percentFluctuating = getPercentFluctuating(
-    avgVndcPrice,
-    usdtExchangePrice,
-    percentInlation || 0.01
+  // const percentFluctuating = getPercentFluctuating(
+  //   avgVndcPrice,
+  //   usdtExchangePrice,
+  //   percentInlation || 0.01
+  // );
+  // console.log("avgVndcPrice", avgVndcPrice);
+  // console.log("avgUsdtPrice", avgUsdtPrice);
+  const percentFluctuating = calculatePercent(
+    avgAskVndc,
+    avgBidVndc,
+    avgAskUsdt,
+    avgBidUsdt
   );
 
   if (percentFluctuating > Number(percentAlertFixed)) {
@@ -87,7 +109,7 @@ const RowInfo = ({
         </td>
         <td className={`${percentFluctuating > 0 ? "up-price" : "down-price"}`}>
           {usdtExchangePrice?.toFixed(2)}
-          <br /> {percentFluctuating}%
+          <br /> {percentFluctuating.toFixed(2)}%
         </td>
       </tr>
       <tr>
