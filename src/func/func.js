@@ -23,10 +23,10 @@ export const calculatePercent = (
   if (deviation1 > deviation2) {
     const deviation = Number(avgAskVndc) - Number(avgBidUsdt);
     console.log("deviationVNDC > USDT", deviation);
-    return (deviation / Number(avgBidUsdt)) * 100;
+    return Number((deviation / Number(avgBidUsdt)) * 100).toFixed(2);
   } else {
     const deviation = Number(avgAskUsdt) - Number(avgBidVndc);
     console.log("deviationVNDC < USDT", deviation);
-    return (deviation / Number(avgBidVndc)) * 100;
+    return Number((deviation / Number(avgBidVndc)) * 100).toFixed(2);
   }
 };

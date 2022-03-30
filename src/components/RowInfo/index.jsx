@@ -45,12 +45,20 @@ const RowInfo = ({
   // );
   // console.log("avgVndcPrice", avgVndcPrice);
   // console.log("avgUsdtPrice", avgUsdtPrice);
-  const percentFluctuating = calculatePercent(
-    avgAskVndc,
-    avgBidVndc,
-    avgAskUsdt,
-    avgBidUsdt
-  );
+  const percentFluctuating =
+    name === "ITAMCUBE"
+      ? getPercentFluctuating(
+          avgVndcPrice,
+          usdtExchangePrice,
+          percentInlation || 0.01
+        )
+      : name === "BCOIN"
+      ? getPercentFluctuating(
+          avgVndcPrice,
+          usdtExchangePrice,
+          percentInlation || 0.01
+        )
+      : calculatePercent(avgAskVndc, avgBidVndc, avgAskUsdt, avgBidUsdt);
 
   if (percentFluctuating > Number(percentAlertFixed)) {
     handleALert();
@@ -109,7 +117,7 @@ const RowInfo = ({
         </td>
         <td className={`${percentFluctuating > 0 ? "up-price" : "down-price"}`}>
           {usdtExchangePrice?.toFixed(2)}
-          <br /> {percentFluctuating.toFixed(2)}%
+          <br /> {percentFluctuating}%
         </td>
       </tr>
       <tr>
