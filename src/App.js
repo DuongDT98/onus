@@ -8,11 +8,11 @@ function getAllListCrypto() {
   return axios.get("https://exchange.vndc.io/exchange/api/v1/showup-prices");
 }
 
-function getCryptoBySymbolAtlas(symbol) {
-  return axios.get(
-    `https://api.attlas.io/api/v1/exchange/depth?symbol=${symbol || "RACAUSDT"}`
-  );
-}
+// function getCryptoBySymbolAtlas(symbol) {
+//   return axios.get(
+//     `https://api.attlas.io/api/v1/exchange/depth?symbol=${symbol || "RACAUSDT"}`
+//   );
+// }
 
 function getCryptoBySymbolMexc(symbol) {
   return axios.get(
@@ -62,8 +62,8 @@ function App() {
   const [usdtVndcFixedP2P, setUsdtVndcFixedP2P] = useState(0);
   const [inputUsdtVndcFixed, setInputUsdtVndcFixed] = useState(0);
   const [playing, alertNotify] = useAudio(notifyAudio);
-  const [atlasRaccaUsdt, setAtlasRaccaUsdt] = useState({});
-  const [atlasRaccaVndc, setAtlasRaccaVndc] = useState({});
+  // const [atlasRaccaUsdt, setAtlasRaccaUsdt] = useState({});
+  // const [atlasRaccaVndc, setAtlasRaccaVndc] = useState({});
   const [itamMexcUsdt, setItamMexcUsdt] = useState(0);
   const [bcoinMexcUsdt, setBcoinMexcUsdt] = useState(0);
   const handleUsdt = async () => {
@@ -89,31 +89,31 @@ function App() {
     }
   };
 
-  const handleGetAtlasCrypto = async () => {
-    try {
-      const resusdt = await getCryptoBySymbolAtlas("RACAUSDT");
-      const resvndc = await getCryptoBySymbolAtlas("RACAVNDC");
-      const dataUsdt = resusdt?.data?.data;
-      const dataVndc = resvndc?.data?.data;
-      setAtlasRaccaUsdt({
-        ask: dataUsdt.bids[0][0],
-        bid: dataUsdt.asks[0][0],
-      });
-      setAtlasRaccaVndc({
-        ask: dataVndc.bids[0][0],
-        bid: dataVndc.asks[0][0],
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const handleGetAtlasCrypto = async () => {
+  //   try {
+  //     const resusdt = await getCryptoBySymbolAtlas("RACAUSDT");
+  //     const resvndc = await getCryptoBySymbolAtlas("RACAVNDC");
+  //     const dataUsdt = resusdt?.data?.data;
+  //     const dataVndc = resvndc?.data?.data;
+  //     setAtlasRaccaUsdt({
+  //       ask: dataUsdt.bids[0][0],
+  //       bid: dataUsdt.asks[0][0],
+  //     });
+  //     setAtlasRaccaVndc({
+  //       ask: dataVndc.bids[0][0],
+  //       bid: dataVndc.asks[0][0],
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   useEffect(() => {
     setInterval(() => {
       handleUsdt();
     }, 10000);
     setInterval(async () => {
-      handleGetAtlasCrypto();
+      // handleGetAtlasCrypto();
       handleGetMexcCrypto();
       const res = await getAllListCrypto();
       const data = res?.data;
@@ -167,21 +167,21 @@ function App() {
       handleALert: handleALert,
       percentShowWarning: 2,
     },
-    {
-      name: "RACAAT",
-      vndcPrice: atlasRaccaVndc,
-      usdtPrice: atlasRaccaUsdt,
-      usdtVndcFixed:
-        inputUsdtVndcFixed > 23000
-          ? inputUsdtVndcFixed
-          : usdtVndcFixedP2P !== 0
-          ? usdtVndcFixedP2P
-          : usdtVndcFixed,
-      pcAlert: 2,
-      percentInlation: 0.02,
-      handleALert: handleALert,
-      percentShowWarning: 1,
-    },
+    // {
+    //   name: "RACAAT",
+    //   vndcPrice: atlasRaccaVndc,
+    //   usdtPrice: atlasRaccaUsdt,
+    //   usdtVndcFixed:
+    //     inputUsdtVndcFixed > 23000
+    //       ? inputUsdtVndcFixed
+    //       : usdtVndcFixedP2P !== 0
+    //       ? usdtVndcFixedP2P
+    //       : usdtVndcFixed,
+    //   pcAlert: 2,
+    //   percentInlation: 0.02,
+    //   handleALert: handleALert,
+    //   percentShowWarning: 1,
+    // },
     {
       name: "ITAMCUBE",
       usdtPrice: itamMexcUsdt !== 0 ? itamMexcUsdt : listCoins["ITAMCUBEUSDT"],
